@@ -9,22 +9,39 @@ const Button = ({ onclick, text }) => {
 const Feedback = (props) => {
   return (
     <div>
-    <h2>Give Feedback</h2>
-    <Button onclick={() => props.setGood(props.good + 1)} text='Good' />
-    <Button onclick={() => props.setNeutral(props.neutral + 1)} text='Neutral' />
-    <Button onclick={() => props.setBad(props.bad + 1)} text='Bad' />
+      <h2>Give Feedback</h2>
+      <Button onclick={() => props.setGood(props.good + 1)} text='Good' />
+      <Button onclick={() => props.setNeutral(props.neutral + 1)} text='Neutral' />
+      <Button onclick={() => props.setBad(props.bad + 1)} text='Bad' />
     </div>
   )
 }
 
-const Statistics = ({good, neutral, bad}) =>{
+const Statistics = ({ good, neutral, bad }) => {
+  const all = good + neutral + bad
+  if (all == 0) {
+    return (
+      <div>
+        <h2>Statistics</h2>
+        <p>
+          No feedback given
+        </p>
+      </div>
+    )
+  }
+
+  const average = (good * 1 + bad * (-1)) / all || 0
+  const positive = (good / all || 0) * 100
   return (
     <div>
-        <h2>Statistics</h2>
+      <h2>Statistics</h2>
       <p>
         Good {good} <br></br>
         Neutral {neutral} <br></br>
-        Bad {bad}
+        Bad {bad} <br></br>
+        All {all} <br></br>
+        Average {average}<br></br>
+        Positive {positive}% <br></br>
       </p>
     </div>
   )
@@ -39,11 +56,11 @@ const App = () => {
   console.log({ neutral })
   return (
     <>
-      <Feedback 
-      setGood={setGood} good={good}
-      setNeutral={setNeutral} neutral={neutral}
-      setBad={setBad} bad={bad}/>
-      <Statistics good = {good} neutral={neutral} bad={bad} />
+      <Feedback
+        setGood={setGood} good={good}
+        setNeutral={setNeutral} neutral={neutral}
+        setBad={setBad} bad={bad} />
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </>
   )
 }
