@@ -17,11 +17,19 @@ const History = ({allClicks}) => {
 
 const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>
 
+
 const App = () => {
   const [left, setLeft] = useState(0)
   const [right, setRight] = useState(0)
   const [allClicks, setAll] = useState([])
   const [total, setTotal] = useState(0)
+
+  const setToValue = (newValue) => () => {
+    console.log('value now', newValue)  // print the new value to console
+    setLeft(newValue)
+    setRight(newValue)
+  }
+
   const handleLeftClick = () => {
     setAll(allClicks.concat('L'))
     const updatedLeft = left + 1 
@@ -40,6 +48,7 @@ const App = () => {
         <Button onClick={handleLeftClick} text='Left'/>
         <Button onClick={handleRightClick} text='Right'/>
         {right}
+        <button onClick={setToValue(1000)}>thousand</button>
       <History allClicks={allClicks}/>
       </div>
   )
