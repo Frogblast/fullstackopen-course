@@ -6,14 +6,23 @@ const Button = ({ onclick, text }) => {
   )
 }
 
-const Feedback = (props) => {
+const Feedback = ({ feedback, setFeedback }) => {
   return (
     <div>
       <h2>Give Feedback</h2>
-      <Button onclick={() => props.setGood(props.good + 1)} text='Good' />
-      <Button onclick={() => props.setNeutral(props.neutral + 1)} text='Neutral' />
-      <Button onclick={() => props.setBad(props.bad + 1)} text='Bad' />
+      <Button onclick={() => setFeedback.setGood(feedback.good + 1)} text='Good' />
+      <Button onclick={() => setFeedback.setNeutral(feedback.neutral + 1)} text='Neutral' />
+      <Button onclick={() => setFeedback.setBad(feedback.bad + 1)} text='Bad' />
     </div>
+  )
+}
+
+const StatisticsLine = (props) => {
+  return (
+    <tr>
+      <td>{props.text}</td>
+      <td> {props.value}</td>
+    </tr>
   )
 }
 
@@ -35,14 +44,15 @@ const Statistics = ({ good, neutral, bad }) => {
   return (
     <div>
       <h2>Statistics</h2>
-      <p>
-        Good {good} <br></br>
-        Neutral {neutral} <br></br>
-        Bad {bad} <br></br>
-        All {all} <br></br>
-        Average {average}<br></br>
-        Positive {positive}% <br></br>
-      </p>
+      <table>
+        <tbody>
+        <StatisticsLine text="Good" value={good} />
+        <StatisticsLine text="Neutral" value={neutral} />
+        <StatisticsLine text="Bad" value={bad} />
+        <StatisticsLine text="Average" value={average} />
+        <StatisticsLine text="Positive" value={positive} />
+        </tbody>
+      </table>
     </div>
   )
 }
@@ -53,13 +63,12 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
-  console.log({ neutral })
+  const feedback = { good, neutral, bad }
+  const setFeedback = { setGood, setNeutral, setBad }
+
   return (
     <>
-      <Feedback
-        setGood={setGood} good={good}
-        setNeutral={setNeutral} neutral={neutral}
-        setBad={setBad} bad={bad} />
+      <Feedback feedback={feedback} setFeedback={setFeedback} />
       <Statistics good={good} neutral={neutral} bad={bad} />
     </>
   )
