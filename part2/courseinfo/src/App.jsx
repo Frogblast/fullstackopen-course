@@ -45,9 +45,11 @@ const App = () => {
   }
   ]
 
-  console.log(courses);
-
-  return <Course courses={courses} />
+  return (
+    <>
+      {courses.map(course => <Course key={course.id} name={course.name} parts={course.parts} />)}
+    </>
+  )
 }
 
 export default App
