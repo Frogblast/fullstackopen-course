@@ -42,6 +42,7 @@ const App = () => {
       setBest(selected)
     }
   }
+  
 
   const handleNext = () => {
     setSelected(randomIndex(0, anecdotes.length - 1))
