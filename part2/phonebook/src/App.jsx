@@ -15,19 +15,24 @@ const App = () => {
     const personObject = {
       name: newName
     }
-    setPersons(persons.concat(personObject))
-    setNewName('')
+    const names = persons.map(person => person.name)
+    if (!names.includes(newName)){
+      setPersons(persons.concat(personObject))
+      setNewName('')
+    } else{
+      alert(`${newName} is already added to phonebook`)
+    }
   }
 
   const DisplayAllNames = () => {
     return (
       <div>
-        {persons.map(person => DisplayName(person))}
+        {persons.map(person => displayName(person))}
       </div>
     )
   }
 
-  const DisplayName = (person)=>{
+  const displayName = (person)=>{
     return (
       <div>
         {person.name}
