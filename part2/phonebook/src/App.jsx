@@ -2,60 +2,59 @@ import { useState } from 'react'
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
-  ]) 
+    {
+      name: 'Arto Hellas',
+      number: '03454',
+      id: 0
+    }
+  ])
   const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
 
-  const handleNewInput = (event) => {
+  const handleNameInput = (event) => {
     setNewName(event.target.value)
   }
 
-  const addNewName = (event) =>{
+  const handleNumberInput = (event) => {
+    setNewNumber(event.target.value)
+  }
+
+  const addNewContact = (event) => {
     event.preventDefault()
+
     const personObject = {
-      name: newName
+      name: newName,
+      id: String(persons.length),
+      number: newNumber
     }
     const names = persons.map(person => person.name)
-    if (!names.includes(newName)){
+    if (names.includes(newName)) {
+      alert(`${newName} is already added to phonebook`)
+    }
+    else if (newName === '' || newNumber === '') {
+      alert('Provide both name and number')
+    }
+    else {
       setPersons(persons.concat(personObject))
       setNewName('')
-    } else{
-      alert(`${newName} is already added to phonebook`)
+      setNewNumber('')
     }
   }
 
-  const DisplayAllNames = () => {
-    return (
-      <div>
-        {persons.map(person => displayName(person))}
-      </div>
-    )
-  }
-
-  const displayName = (person)=>{
-    return (
-      <div>
-        {person.name}
-      </div>
-    )
+  const Contact = ({ name, number }) => {
+    return <div>{name} {number}</div>
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form>
-        <div>
-          name: <input
-          value={newName}
-          onChange={handleNewInput}
-        />
-        </div>
-        <div>
-          <button onClick={addNewName} type="submit">add</button>
-        </div>
+      <form onSubmit={addNewContact}>
+        <div>name: <input onChange={handleNameInput} value={newName} /></div>
+        <div>number: <input onChange={handleNumberInput} value={newNumber} /></div>
+        <div><button type="submit">add</button></div>
       </form>
       <h2>Numbers</h2>
-      <DisplayAllNames />
+      {persons.map(person => <Contact key={person.id} name={person.name} number={person.number} />)}
     </div>
   )
 }
