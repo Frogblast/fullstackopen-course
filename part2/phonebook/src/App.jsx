@@ -23,7 +23,7 @@ const Contact = ({ name, number }) => {
   return <div>{name} {number}</div>
 }
 
-const Persons = ({persons, filter}) => {
+const Persons = ({ persons, filter }) => {
   const personsToShow = () => {
     return persons.filter(person => { return person.name.toLowerCase().includes(filter.toLowerCase()) })
   }
@@ -42,12 +42,11 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
 
-  useEffect(()=>{
-    console.log("effect")
-    axios.get('http://localhost:3001/persons').then(response =>{
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons").then(response => {
       setPersons(response.data)
     })
-  })
+  }, []) // The [] argument makes this get request only happens when the component renders
 
   const handleNameInput = (event) => {
     setNewName(event.target.value)
@@ -66,34 +65,38 @@ const App = () => {
 
     const personObject = {
       name: newName,
-      id: String(persons.length + 1),
       number: newNumber
     }
+
     const names = persons.map(person => person.name)
     if (names.includes(newName)) {
       alert(`${newName} is already added to phonebook`)
+      return
     }
-    else if (newName === '' || newNumber === '') {
+    if (newName === '' || newNumber === '') {
       alert('Provide both name and number')
+      return
     }
-    else {
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
-    }
+    setNewName('')
+    setNewNumber('')
+    axios
+      .post("http://localhost:3001/persons", personObject)
+      .then(response => {
+        setPersons(persons.concat(response.data))
+      })
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
       <Filter onChange={handleFilterInput} />
-      <h3>Add a new</h3>      
+      <h3>Add a new</h3>
       <PersonForm
         onSubmit={addNewContact} onChangeName={handleNameInput} valueName={newName}
         onChangeNumber={handleNumberInput} valueNumber={newNumber}
       />
       <h3>Numbers</h3>
-      <Persons persons={persons} filter={newFilter}/>
+      <Persons persons={persons} filter={newFilter} />
     </div>
   )
 }
