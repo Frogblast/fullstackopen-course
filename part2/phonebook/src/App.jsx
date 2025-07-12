@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import contactService from './services/contacts'
 
 const Filter = ({ onChange }) => {
   return (
@@ -43,9 +44,7 @@ const App = () => {
   const [newFilter, setNewFilter] = useState('')
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then(response => {
-      setPersons(response.data)
-    })
+    contactService.getAll().then(response => setPersons(response.data))
   }, []) // The [] argument makes this get request only happens when the component renders
 
   const handleNameInput = (event) => {
@@ -77,13 +76,13 @@ const App = () => {
       alert('Provide both name and number')
       return
     }
-    setNewName('')
-    setNewNumber('')
-    axios
-      .post("http://localhost:3001/persons", personObject)
+    contactService
+      .add(personObject)
       .then(response => {
         setPersons(persons.concat(response.data))
       })
+    setNewName('')
+    setNewNumber('')
   }
 
   return (
