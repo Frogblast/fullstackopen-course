@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import contactService from './services/contacts'
 
 const Filter = ({ onChange }) => {
@@ -20,18 +19,28 @@ const PersonForm = ({ onSubmit, onChangeName, valueName, onChangeNumber, valueNu
   )
 }
 
-const Contact = ({ name, number }) => {
-  return <div>{name} {number}</div>
+const Contact = ({name, number, id, deleteContact}) => {
+  return (
+    <div>{name} {number}
+      <button onClick={() => deleteContact(id)} >delete</button>
+    </div>
+  )
 }
 
-const Persons = ({ persons, filter }) => {
+const Persons = ({ persons, filter, deleteContact }) => {
   const personsToShow = () => {
     return persons.filter(person => { return person.name.toLowerCase().includes(filter.toLowerCase()) })
   }
 
   return (
     <>
-      {personsToShow().map(person => <Contact key={person.id} name={person.name} number={person.number} />)}
+      {personsToShow().map(person => 
+        <Contact 
+          key={person.id}
+          id={person.id}
+          name={person.name}
+          number={person.number}
+          deleteContact={deleteContact}/>)}
     </>
   )
 }
@@ -85,6 +94,15 @@ const App = () => {
     setNewNumber('')
   }
 
+  const deleteContact = (id) => {
+    const person = persons.find(person => person.id === id)
+    if (person === null) return
+
+    contactService.deleteContact(id)
+      .then(() => setPersons(persons.filter(person => person.id !== id)))
+      .catch(error => {alert(error)})
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -95,7 +113,7 @@ const App = () => {
         onChangeNumber={handleNumberInput} valueNumber={newNumber}
       />
       <h3>Numbers</h3>
-      <Persons persons={persons} filter={newFilter} />
+      <Persons persons={persons} filter={newFilter} deleteContact={deleteContact} />
     </div>
   )
 }

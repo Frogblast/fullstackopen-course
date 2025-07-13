@@ -10,4 +10,9 @@ const add = newPerson => {
   return request
 }
 
-export default {getAll, add}
+const deleteContact = id => {
+  const request = axios.delete(`${baseUrl}/${id}`)    
+  return request
+}
+
+export default {getAll, add, deleteContact}
