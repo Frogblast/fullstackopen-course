@@ -71,14 +71,21 @@ const App = () => {
   const addNewContact = (event) => {
     event.preventDefault()
 
-    const personObject = {
+    const newPerson = {
       name: newName,
       number: newNumber
     }
-
+    
     const names = persons.map(person => person.name)
     if (names.includes(newName)) {
-      alert(`${newName} is already added to phonebook`)
+      if(window.confirm(`${newName} is already in the phonebook.
+        Do you want to replace the old number with the new?`)){
+          const personToUpdate = persons.filter(person => person.name === newName)[0]
+          const updatedPerson = {...personToUpdate, number: newNumber}                 
+          contactService
+          .update(personToUpdate.id, updatedPerson)
+          .then(response => setPersons(persons.map(p=>p.id!==personToUpdate.id ? p : response)))
+        }
       return
     }
     if (newName === '' || newNumber === '') {
@@ -86,7 +93,7 @@ const App = () => {
       return
     }
     contactService
-      .add(personObject)
+      .add(newPerson)
       .then(response => {
         setPersons(persons.concat(response.data))
       })
