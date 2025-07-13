@@ -98,9 +98,11 @@ const App = () => {
     const person = persons.find(person => person.id === id)
     if (person === null) return
 
-    contactService.deleteContact(id)
+    if (window.confirm(`Do you want to delete ${person.name}?`)) {
+      contactService.deleteContact(id)
       .then(() => setPersons(persons.filter(person => person.id !== id)))
       .catch(error => {alert(error)})
+    }
   }
 
   return (
