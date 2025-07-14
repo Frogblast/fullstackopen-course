@@ -1,10 +1,10 @@
-export const Notification = ({ message }) => {
+export const Notification = ({ message, isError }) => {
   if (message === null) {
     return null;
   }
 
   const notificationStyle = {
-    color: 'green',
+    color: isError? 'red':'green',
     background: 'lightgrey',
     fontSize: '20px',
     borderStyle: 'solid',
@@ -13,6 +13,8 @@ export const Notification = ({ message }) => {
     marginBottom: '10px'
   };
 
+  console.log(notificationStyle);
+  
   return (
     <div style={notificationStyle}>
       {message}

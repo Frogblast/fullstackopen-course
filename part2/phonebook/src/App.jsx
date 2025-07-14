@@ -12,6 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
   const [confirmation, setConfirmation] = useState(null)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
     contactService.getAll().then(response => setPersons(response.data))
@@ -50,7 +51,14 @@ const App = () => {
         const updatedPerson = { ...personToUpdate, number: newNumber }
         contactService
           .update(personToUpdate.id, updatedPerson)
-          .then(response => setPersons(persons.map(p => p.id !== personToUpdate.id ? p : response)))
+          .then(response => 
+            setPersons(persons.map(p => p.id !== personToUpdate.id ? p : response)))
+          .catch(() => {
+            setConfirmation(`${newName} was already removed from the phonebook`)
+            setIsError(true)
+            setTimeout(()=> setConfirmation(null), 4000)
+            setPersons(persons.filter(p=>p.id!==personToUpdate.id))
+          })
       }
     } else {
       contactService
@@ -60,6 +68,7 @@ const App = () => {
         })
     }
     setConfirmation(`Added ${newName}`)
+    setIsError(false)
     setTimeout(() => {
       setConfirmation(null)
     }, 4000)
@@ -81,7 +90,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={confirmation} />
+      <Notification message={confirmation} isError={isError} />
       <Filter onChange={handleFilterInput} />
       <h3>Add a new</h3>
       <PersonForm
