@@ -1,49 +1,9 @@
 import { useState, useEffect } from 'react'
 import contactService from './services/contacts'
-
-const Filter = ({ onChange }) => {
-  return (
-    <div>
-      filter shown with: <input onChange={onChange} />
-    </div>
-  )
-}
-
-const PersonForm = ({ onSubmit, onChangeName, valueName, onChangeNumber, valueNumber }) => {
-  return (
-    <form onSubmit={onSubmit}>
-      <div>name: <input onChange={onChangeName} value={valueName} /></div>
-      <div>number: <input onChange={onChangeNumber} value={valueNumber} /></div>
-      <div><button type="submit">add</button></div>
-    </form>
-  )
-}
-
-const Contact = ({name, number, id, deleteContact}) => {
-  return (
-    <div>{name} {number}
-      <button onClick={() => deleteContact(id)} >delete</button>
-    </div>
-  )
-}
-
-const Persons = ({ persons, filter, deleteContact }) => {
-  const personsToShow = () => {
-    return persons.filter(person => { return person.name.toLowerCase().includes(filter.toLowerCase()) })
-  }
-
-  return (
-    <>
-      {personsToShow().map(person => 
-        <Contact 
-          key={person.id}
-          id={person.id}
-          name={person.name}
-          number={person.number}
-          deleteContact={deleteContact}/>)}
-    </>
-  )
-}
+import { Notification } from './components/Notification'
+import { Filter } from './components/Filter'
+import { PersonForm } from './components/PersonForm'
+import { Persons } from './components/Persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -51,6 +11,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [confirmation, setConfirmation] = useState(null)
 
   useEffect(() => {
     contactService.getAll().then(response => setPersons(response.data))
@@ -75,28 +36,33 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    
+
     const names = persons.map(person => person.name)
-    if (names.includes(newName)) {
-      if(window.confirm(`${newName} is already in the phonebook.
-        Do you want to replace the old number with the new?`)){
-          const personToUpdate = persons.filter(person => person.name === newName)[0]
-          const updatedPerson = {...personToUpdate, number: newNumber}                 
-          contactService
-          .update(personToUpdate.id, updatedPerson)
-          .then(response => setPersons(persons.map(p=>p.id!==personToUpdate.id ? p : response)))
-        }
-      return
-    }
+
     if (newName === '' || newNumber === '') {
       alert('Provide both name and number')
       return
     }
-    contactService
-      .add(newPerson)
-      .then(response => {
-        setPersons(persons.concat(response.data))
-      })
+    if (names.includes(newName)) {
+      if (window.confirm(`${newName} is already in the phonebook.
+        Do you want to replace the old number with the new?`)) {
+        const personToUpdate = persons.filter(person => person.name === newName)[0]
+        const updatedPerson = { ...personToUpdate, number: newNumber }
+        contactService
+          .update(personToUpdate.id, updatedPerson)
+          .then(response => setPersons(persons.map(p => p.id !== personToUpdate.id ? p : response)))
+      }
+    } else {
+      contactService
+        .add(newPerson)
+        .then(response => {
+          setPersons(persons.concat(response.data))
+        })
+    }
+    setConfirmation(`Added ${newName}`)
+    setTimeout(() => {
+      setConfirmation(null)
+    }, 4000)
     setNewName('')
     setNewNumber('')
   }
@@ -107,14 +73,15 @@ const App = () => {
 
     if (window.confirm(`Do you want to delete ${person.name}?`)) {
       contactService.deleteContact(id)
-      .then(() => setPersons(persons.filter(person => person.id !== id)))
-      .catch(error => {alert(error)})
+        .then(() => setPersons(persons.filter(person => person.id !== id)))
+        .catch(error => { alert(error) })
     }
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={confirmation} />
       <Filter onChange={handleFilterInput} />
       <h3>Add a new</h3>
       <PersonForm
